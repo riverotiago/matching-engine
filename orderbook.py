@@ -12,10 +12,6 @@ class IOrderBook(ABC):
     pass
 
   @abstractmethod
-  def get(self, price: float) -> Node:
-    pass
-
-  @abstractmethod
   def remove(self, order: Order):
     pass
 
@@ -30,11 +26,15 @@ class IOrderBook(ABC):
 
 class OrderBook(IOrderBook):
   def __init__(self):
+    self.idx = 0
     self.orders = BinarySearchTree()
 
   def add(self, order: Order):
-    node = Node(key=order.price, content=[order])
+    key = (order.price, self.idx)
+    print("inserting",key)
+    node = Node(key=key)
     self.orders.insert(node)
+    self.idx += 1
 
   def remove(self, order: Order):
     pass
@@ -60,4 +60,4 @@ class OrderBook(IOrderBook):
       node = self.orders.getPredecessor(node) 
 
   def __str__(self):
-    return "\n".join(map(lambda node: str(node.content), self.orders.traverse(self.orders.root)))
+    return "\n".join(map(lambda node: str(node.key), self.orders.traverse(self.orders.root)))

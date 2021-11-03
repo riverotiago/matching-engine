@@ -1,24 +1,23 @@
 import unittest
 from orderbook import OrderBook
 from order import Order, OrderSide, OrderType
-from binary_search_tree import Node
+from avl_tree import AVLTree, AVLNode
 from typing import Optional
-
-def DFS(node: Optional[Node]):
-  pass
-
 
 class TestOrderbook(unittest.TestCase):
 
-  def test_orderbook(self):
-    ob = OrderBook()
-    ob.add(Order(0, OrderSide.BUY, OrderType.LIMIT, 100, 10))
-    ob.add(Order(1, OrderSide.BUY, OrderType.LIMIT, 100, 20))
-    ob.add(Order(2, OrderSide.BUY, OrderType.LIMIT, 100, 30))
-    ob.add(Order(3, OrderSide.BUY, OrderType.LIMIT, 120, 30))
+    def test_add(self):
+        ob = OrderBook()
 
-    ob.orders.traverse(ob.orders.root)
+        for i in range(10,14):
+            ob.add(Order(OrderSide.BUY, OrderType.LIMIT, i, 10))
+            ob.add(Order(OrderSide.BUY, OrderType.LIMIT, i, 20))
 
+        print(ob)
+        
+
+    def test_remove(self):
+        pass
 
 if __name__ == '__main__':
   unittest.main()

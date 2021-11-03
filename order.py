@@ -1,7 +1,9 @@
+from datetime import datetime
 from typing import Optional, Any, List
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from enum import Enum
+from datetime import datetime as dt
 
 
 class OrderType(Enum):
@@ -16,7 +18,6 @@ class OrderSide(Enum):
 
 @dataclass
 class Order:
-    id: int
     type: OrderType
     side: OrderSide
     price: float

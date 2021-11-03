@@ -25,9 +25,11 @@ python main.py
 
 ## Comandos
 
-Há dois tipos de ordens disponíveis: limit/market
-Limit coloca uma ordem passiva com preço limite para compra ou venda. (Não geram trades, para simplificação do programa)
-Market coloca uma ordem de execução imediata. (Geram trades, com preenchimentos completos ou parciais ao melhor preço disponível)
+Há dois tipos de ordens disponíveis: limit/market.
+
+Limit coloca uma ordem passiva com preço limite para compra ou venda. (Não geram trades, para simplificação do programa).
+
+Market coloca uma ordem de execução imediata. (Geram trades, com preenchimentos completos ou parciais ao melhor preço disponível).
 
 ```
 limit <buy|sell> <price> <qty>

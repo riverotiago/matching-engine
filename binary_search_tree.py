@@ -18,34 +18,34 @@ class Node:
 class BinarySearchTree:
     root: Node = None
 
-    def insert(self, node: Node):
-        y = None
-        x = self.root
+    def insert(self, insert_node: Node):
+        node = None
+        next_node = self.root
 
         # find the parent node
-        while x != None:
-            y = x
-            if node.key < x.key:
-                x = x.left
+        while next_node != None:
+            node = next_node
+            if insert_node.key < next_node.key:
+                next_node = next_node.left
             else:
-                x = x.right
-        node.parent = y
+                next_node = next_node.right
+        insert_node.parent = node
 
         # insert the node
-        if y == None:
-            self.root = node
-        elif node.key < y.key:
-            y.left = node
-        elif node.key > y.key:
-            y.right = node
+        if node == None:
+            self.root = insert_node
+        elif insert_node.key < node.key:
+            node.left = insert_node
+        elif insert_node.key > node.key:
+            node.right = insert_node
         else:
             raise Exception('Invalid node')
 
     def traverse(self, node: Optional[Node]):
         if node:
-            self.traverse(node.left)
-            print(node.key)
-            self.traverse(node.right)
+            yield self.traverse(node.left)
+            yield node
+            yield self.traverse(node.right)
 
     def getMin(self, node: Node, limit: Any = float('-inf')) -> Node:
         while node.left != None and node.left.key[0] <= limit:

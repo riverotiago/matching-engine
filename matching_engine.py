@@ -5,12 +5,14 @@ from enum import Enum
 from order import Order, OrderSide, OrderType
 from orderbook import IOrderBook, OrderBook
 from trade import Trade
+import math
 
 @dataclass
 class MatchingEngine:
 
     buyOrderBook: IOrderBook
     sellOrderBook: IOrderBook
+    previousTrades: List[Trade] = field(default_factory=list)
 
     def _add(self, order: Order):
         if order.side == OrderSide.BUY:
@@ -18,37 +20,58 @@ class MatchingEngine:
         else:
             self.sellOrderBook.add(order)
 
-    def fillLimit(self, order: Order, price: float, qty: int):
-        pass
 
-    def fillMarket(self, orderBook: IOrderBook, qty: int):
-        orders = []
-        for order in orderBook.getFromMin():
-            if order.qty >= qty:
-                orders.append(order)
-            else:
-                qty -= order.qty
-                orders.append(order)
-        return orders if orders else None
+    def _fillBuyOrder(self, order: Order):
+        """
+            Tenta completar a ordem até não haver mais ordens no livro,
+            ou ultrapassar o valor limite (se for um limit order).
+        """
+        # Acha a ordem de venda com menor valor
+        minPrice = self.sellOrderBook.getMinPrice()
+        qty = order.qty
 
-    def fill(self, orderBook: IOrderBook, price: float, qty: int, limit: bool) -> Optional[Trade]:
-        """ Try to fill order price and quantity. """
-        orders = self.fillMarket(orderBook, qty)
+        # Enquanto houver ordens disponíveis dentro do melhor preço 
+        # e a quantidade de ordens não for atingida, executar a compra
+        filled = self.sellOrderBook.popQty(minPrice, qty)
+
+        # Se não foi possível completar a ordem, sai do loop
+        if filled > 0:
+            self.exec(Trade(price=minPrice, qty=filled))
+
+
+    def _fillSellOrder(self, order: Order):
+        """
+            Tenta completar a ordem até não haver mais ordens no livro,
+            ou ultrapassar o valor limite (se for um limit order).
+        """
+        # Acha a ordem de compra com maior valor
+        maxPrice = self.buyOrderBook.getMaxPrice()
+        qty = order.qty
+
+
+        # Enquanto houver ordens disponíveis dentro do preço máximo
+        # e a quantidade de ordens não for atingida, executar a compra
+        filled = self.buyOrderBook.popQty(maxPrice, qty)
+
+        if filled > 0:
+            self.exec(Trade(price=maxPrice, qty=filled))
+
 
     def match(self, order: Order):
+        """
+            Acha um match para a ordem de mercado.
+        """
         if order.side == OrderSide.BUY:
-            trade = self.fill(self.sellOrderBook, order.price,
-                              order.qty, order.type == OrderType.LIMIT)
-            self.exec(trade)
+            self._fillBuyOrder(order)
         else:
-            trade = self.fill(self.buyOrderBook, order.price,
-                              order.qty, order.type == OrderType.LIMIT)
-            self.exec(trade)
+            self._fillSellOrder(order)
 
-    # make order
     def order(self, order: Order):
-        self._add(order)
-        self.match(order)
+        if order.type == OrderType.MARKET:
+            self.match(order)
+        else:
+            self._add(order)
 
     def exec(self, trade: Trade):
-        print("Trade", trade)
+        self.previousTrades.append(trade)
+        print(f"Trade, price: {trade.price}, qty: {trade.qty}")

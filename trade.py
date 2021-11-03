@@ -7,6 +7,5 @@ from orderbook import IOrderBook, OrderBook
 
 @dataclass
 class Trade:
-    ordersFilled: List[Order]
     price: float
     qty: int

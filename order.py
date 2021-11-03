@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from enum import Enum
 from datetime import datetime as dt
+import math
 
 
 class OrderType(Enum):
@@ -20,5 +21,5 @@ class OrderSide(Enum):
 class Order:
     type: OrderType
     side: OrderSide
-    price: float
-    qty: float
+    price: float = None
+    qty: float = 0
